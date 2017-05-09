@@ -1,3 +1,44 @@
+//為何要切成一個一個component的原因是要讓這些事情變得稍微易讀且好看些
+
+//顯示在頁面上的字的component，不參與user event喔，所以他是個prsentation component
+var GreeterMessage = React.createClass({
+    render: function() { 
+      //要放在render method裡面因為這邊是object結構，
+      //這邊在傳遞props，注意container元件Greeter裡面的<GreeterMessage name={name} message={message}/>
+      var name = this.props.name;
+      var message = this.props.message;
+      return (
+         <div>
+           <h1>Hello {name}!</h1>
+           <p>{message}</p>
+         </div>
+      );
+    }//讓我們要印出的東西去對應到想要傳遞過來的props啦
+});
+
+//form的component
+var GreeterForm = React.createClass({
+    onFormSubmit: function(e){
+      e.preventDefault();//預防預設的動作，也就是browser重整
+      var name = this.refs.name.value;//從下面<input type="text" ref="name" />傳遞props
+      if (name.length > 0){//如果我們輸入的字串大於0
+        this.refs.name.value = '';//刷新讓輸入框變回0
+        //接收到此元件的props並觸動事件，且使用這邊的locoal變數name也就是將經過input傳遞過來的字串
+        this.props.onNewName(name);
+      }
+    },
+    render: function(){
+       return (
+        <form onSubmit={this.onFormSubmit}>
+            <input type="text" ref="name" />
+            <button>輸入姓名</button>
+          </form>
+       );
+    }
+});
+
+
+
 var Greeter = React.createClass({
 
 //預設props值
@@ -6,76 +47,59 @@ var Greeter = React.createClass({
           name: 'React',
           message: 'hello who are you ?'
       };
-    },//預設的props如果我們沒有給予Greeter props name的話，就會印這邊的
+    },
 
-//state區塊 
+//設定元件內的state狀態 
   getInitialState: function(){
     return {
-        name: this.props.name//將name的state 設為等於props的value
+        name: this.props.name//將name的state 設為等於屬性名的value，透過props傳過來也就是字串Paul
     };
-/*這邊是state的，state不能跟props
-一樣用這樣 this.state.name = name;的方式來進行宣告要用this.setState();*/
-
   },
 
- //事件區塊
-  onButtonClick: function(e){
-      e.preventDefault();//不讓預設的submit去跑
+ //點擊事件區塊
+      handleNewName: function(name){
+         this.setState({
+           name: name 
+           //讓這個property等於此function的參數name也就是user輸入的值
+           //，是經過另外一個component更新的
+           //而這個method將會更新state，讓render出去的東西跟著改變
+         });
+      },
 
-      var name = this.refs.name.value;//連結input
-      //測試時候用的alert(name);
-      //加入state
-      this.setState({
-          name:name
-      });
-  },
-
-//render出去的component
+//render出去的
   render: function(){
-    var name = this.state.name;
+    var name = this.state.name;//fetch上面的state值
     var message = this.props.message;//一定要記得使用this.props.屬性名
-    //也可以直接在希望印出的地方使用花括號
      return (
         <div>
-          <h1>Hi how are you? {name}</h1>
-          <p>{message + '!!!!'}</p>
-
-          <form onSubmit={this.onButtonClick}>
-
-            <input type="text" ref="name" />
-            <button>輸入姓名</button>
-
-          </form>
-
+          <GreeterMessage name={name} message = {message}/>  
+          <GreeterForm onNewName={this.handleNewName} />
         </div>
-
-      );//onSubmit是個捕捉妳的form submit的method喔
-      //ref是referance代表的意思
-  }//這是Greeter內的method啦
-
+      );
+    }
+    //<GreeterMessage name={name} message = {message}/> 會將值props回去對應的component
+    //這邊的變數name會對應到this.state.name
+    //而這邊的state則會先對應到<Greeter name={firstName} message={messageForEmployee} />的props
+    //也就是Paul，上找一下會找到，在getInitialStates裡面
+    //接著<GreeterForm onNewName={this.handleNewName} />將onNewName這個屬性props至GreeterForm component
+    //然後onNewName屬性的值為handleNewName這個function也就是說，一開始等價於Greeter的屬性name的value
+    //接著我們可以看到GreeterForm這個component內會因為user輸入的值而改變handleNewName 的setState來進行更新
+    //而一旦handleNewName中的state更新了，那麼render 名字出去的也將會被更新
 });
+
 
 var firstName = 'Paul';
 var messageForUser = "hi user"
 var messageForEmployee = "howdy punk"
+
+
 ReactDOM.render(
   <Greeter name={firstName} message={messageForEmployee} />,
   document.getElementById('app')
 );
 
 
-
-/*var Greeter = React.createClass({
-  render: function(){
-       return React.createElement (
-         'h1',
-         null,
-         'Hello React.createElement'
-      )這個方法也可以，但不好讀且不好維護
-  }//這是Greeter內的method啦
-
-});*/
-
-/* props可以傳遞屬性值與一些東西，有點像更新
-   state可以更新跟維持，有點像是
-*/
+/*記得寫使用流程啦，這整個設計思考捏*/
+//presentation component 簡單地負責接收或處理props以及render東西
+//Greeter component是典型的container component
+//一個重要觀念，state是可以被動態更新的，但props不行
