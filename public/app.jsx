@@ -20,12 +20,17 @@ var GreeterMessage = React.createClass({
 var GreeterForm = React.createClass({
     onFormSubmit: function(e){
       e.preventDefault();//預防預設的動作，也就是browser重整
+     
+     var updates = {};
+     
       var name = this.refs.name.value;//從下面<input type="text" ref="name" />傳遞props
       if (name.length > 0){//如果我們輸入的字串大於0
         this.refs.name.value = '';//刷新讓輸入框變回0
-        //接收到此元件的props並觸動事件，且使用這邊的locoal變數name也就是將經過input傳遞過來的字串
-        this.props.onNewName(name);
+        updates.name = name;
+       
       }
+       //接收到此元件的props並觸動事件，且使用這邊的locoal變數name也就是將經過input傳遞過來的字串
+        this.props.onNewName(name);
     },
     render: function(){
        return (
