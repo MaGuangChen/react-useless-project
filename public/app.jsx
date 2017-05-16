@@ -1,5 +1,3 @@
-//為何要切成一個一個component的原因是要讓這些事情變得稍微易讀且好看些
-
 //顯示在頁面上的字的component，不參與user event喔，所以他是個prsentation component
 var GreeterMessage = React.createClass({
     render: function() { 
@@ -27,7 +25,7 @@ var GreeterForm = React.createClass({
       var message = this.refs.message.value;
       if (name.length > 0){//如果我們輸入的字串大於0
         this.refs.name.value = '';//刷新讓輸入框變回0
-        updates.name = name;  
+        updates.name = name;//讓這個object有一個新的property值為變數name  
       }
       
       if(message.length > 0){//如果我們輸入的字串大於0
@@ -81,9 +79,6 @@ var Greeter = React.createClass({
  //點擊事件區塊
       handleNewData: function(updates){
          this.setState(updates);
-           //讓這個property等於此function的參數name也就是user輸入的值
-           //，是經過另外一個component更新的
-           //而這個method將會更新state，讓render出去的東西跟著改變
       },
 
 //render出去的
@@ -97,29 +92,14 @@ var Greeter = React.createClass({
         </div>
       );
     }
-    //<GreeterMessage name={name} message = {message}/> 會將值props回去對應的component
-    //這邊的變數name會對應到this.state.name
-    //而這邊的state則會先對應到<Greeter name={firstName} message={messageForEmployee} />的props
-    //也就是Paul，上找一下會找到，在getInitialStates裡面
-    //接著<GreeterForm onNewName={this.handleNewName} />將onNewName這個屬性props至GreeterForm component
-    //然後onNewName屬性的值為handleNewName這個function也就是說，一開始等價於Greeter的屬性name的value
-    //接著我們可以看到GreeterForm這個component內會因為user輸入的值而改變handleNewName 的setState來進行更新
-    //而一旦handleNewName中的state更新了，那麼render 名字出去的也將會被更新
 });
 
 
 var firstName = 'Paul';
-var messageForUser = "hi user"
-var messageForEmployee = "howdy punk"
+var messageForUser = "howdy punk"
 
 
 ReactDOM.render(
-  <Greeter name={firstName} message={messageForEmployee} />,
+  <Greeter name={firstName} message={messageForUser} />,
   document.getElementById('app')
 );
-
-
-/*記得寫使用流程啦，這整個設計思考捏*/
-//presentation component 簡單地負責接收或處理props以及render東西
-//Greeter component是典型的container component
-//一個重要觀念，state是可以被動態更新的，但props不行
