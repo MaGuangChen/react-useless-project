@@ -1,3 +1,6 @@
+var React = require('react');
+var ReactDom = require('react-dom');
+
 //顯示在頁面上的字的component，不參與user event喔，所以他是個prsentation component
 var GreeterMessage = React.createClass({
     render: function() { 
